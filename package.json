@@ -8,9 +8,9 @@
   },
   "scripts": {
     "start": "vite --port 3000",
-    "build": "vite build --emptyOutDir",
+    "build": "vite build --outDir dist",
     "build:clean": "rm -rf dist && vite build",
-    "deploy": "npm run build && vercel --prod --force",
+    "deploy": "npm run build && npx netlify deploy --prod --dir=dist",
     "preview": "vite preview"
   },
   "dependencies": {

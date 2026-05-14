@@ -1,6 +1,6 @@
 // ─── CertifyPro API Client ────────────────────────────────────────────────────
 // Local dev: Vite proxies `/api` → `localhost:5000`.
-// Production (Vercel): set `VITE_API_URL` to your Render API base, e.g.
+// Production (Netlify): set `VITE_API_URL` to your Render API base, e.g.
 //   https://certifypro-0lmb.onrender.com/api
 const BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
