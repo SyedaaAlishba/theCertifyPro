@@ -7,9 +7,9 @@
     "node": "24.x"
   },
   "scripts": {
-    "start": "vite --port 3000",
-    "build": "vite build --outDir dist",
-    "build:clean": "rm -rf dist && vite build",
+    "start": "npx vite --port 3000",
+    "build": "npx vite build --outDir dist",
+    "build:clean": "rm -rf dist && npx vite build",
     "deploy": "npm run build && npx netlify deploy --prod --dir=dist",
     "preview": "vite preview"
   },
