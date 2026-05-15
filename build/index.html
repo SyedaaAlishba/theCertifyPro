@@ -19,7 +19,7 @@
       const originalFetch = window.fetch;
       window.fetch = function(...args) {
         if (args[0] && args[0].includes && args[0].includes('/auth/google')) {
-          window.location.href = 'https://certifypro-0lmb.onrender.com/api/auth/google';
+          window.location.href = 'https://thecertifypro-backend.onrender.com/api/auth/google';
           return Promise.reject(new Error('Redirecting to Google OAuth'));
         }
         return originalFetch.apply(this, args);

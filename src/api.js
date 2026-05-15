@@ -1,7 +1,7 @@
 // ─── CertifyPro API Client ────────────────────────────────────────────────────
 // Local dev: Vite proxies `/api` → `localhost:5000`.
 // Production (Netlify): set `VITE_API_URL` to your Render API base, e.g.
-//   https://certifypro-0lmb.onrender.com/api
+//   https://thecertifypro-backend.onrender.com/api
 const BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 // Token helpers
@@ -14,7 +14,7 @@ async function request(method, path, body, isFormData = false) {
   // BLOCK any attempt to fetch Google OAuth endpoint
   if (path === '/auth/google' || path.includes('/auth/google')) {
     console.error('Blocked: Google OAuth must use browser redirect, not fetch');
-    window.location.href = 'https://certifypro-0lmb.onrender.com/api/auth/google';
+    window.location.href = `${BASE_URL}/auth/google`;
     throw new Error('Redirecting to Google OAuth');
   }
 

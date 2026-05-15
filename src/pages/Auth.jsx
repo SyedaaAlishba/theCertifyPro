@@ -23,10 +23,10 @@ export const Auth = ({ onAuthSuccess, setPage }) => {
           btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            window.location.href = 'https://certifypro-0lmb.onrender.com/api/auth/google';
+            window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
             return false;
           };
-          btn.href = 'https://certifypro-0lmb.onrender.com/api/auth/google';
+          btn.href = `${import.meta.env.VITE_API_URL}/auth/google`;
         }
       });
     };
@@ -47,10 +47,7 @@ export const Auth = ({ onAuthSuccess, setPage }) => {
       localStorage.setItem('cp_token', token);
       
       // Fetch user data from Render backend
-      fetch('https://certifypro-0lmb.onrender.com/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-        .then(res => res.json())
+      auth.me()
         .then(user => {
           onAuthSuccess({ token, user });
           toast("Signed in with Google successfully!");
@@ -174,13 +171,13 @@ export const Auth = ({ onAuthSuccess, setPage }) => {
           <Divider label="OR CONTINUE WITH" />
 
           <a 
-            href="https://certifypro-0lmb.onrender.com/api/auth/google"
+            href={`${import.meta.env.VITE_API_URL}/auth/google`}
             className="btn-ghost" 
             style={{ width: "100%", padding: "12px", fontSize: 14, display: "flex", justifyContent: "center", alignItems: "center", textDecoration: "none", boxSizing: "border-box" }}
             onClick={(e) => {
               // Ensure it works even if something tries to prevent default
               e.preventDefault();
-              window.location.href = 'https://certifypro-0lmb.onrender.com/api/auth/google';
+              window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
