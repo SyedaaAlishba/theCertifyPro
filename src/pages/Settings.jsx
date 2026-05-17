@@ -46,7 +46,7 @@ export const Settings = ({ user, setUser }) => {
         <p style={{ color: "var(--sub)", fontSize: 16 }}>Manage your personal profile and organization defaults.</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32 }}>
         
         {/* Left Column: Profile Overview */}
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }} className="au1">

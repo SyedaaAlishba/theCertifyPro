@@ -8,10 +8,20 @@ export const ResetPassword = ({ setPage }) => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
 
+  const isMounted = React.useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const t = urlParams.get('token');
-    if (t) setToken(t);
+    if (t) {
+      if (isMounted.current) setToken(t);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -25,14 +35,20 @@ export const ResetPassword = ({ setPage }) => {
 
     setLoading(true);
     try {
-      const data = await auth.resetPassword({ token, newPassword: password });
+      await auth.resetPassword({ token, newPassword: password });
 
       toast("Password reset successfully! You can now sign in.");
-      setPage("auth");
+      if (isMounted.current) {
+        setPage("auth");
+      }
     } catch (err) {
-      toast(err.message, "error");
+      if (isMounted.current) {
+        toast(err.message, "error");
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 

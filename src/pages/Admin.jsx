@@ -8,29 +8,47 @@ export const Admin = ({ user }) => {
   const [data, setData] = useState([]);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  const loadData = async () => {
+  const isMounted = React.useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const loadData = React.useCallback(async () => {
     try {
       const res = await payments.list();
-      setData(res.payments || []);
+      if (isMounted.current) {
+        setData(res.payments || []);
+      }
     } catch (err) {
-      toast(err.message || 'Failed to load payments', 'error');
+      if (isMounted.current) {
+        toast(err.message || 'Failed to load payments', 'error');
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const handleAction = async (id, action) => {
     try {
       if (action === 'approve') await payments.approve(id);
       if (action === 'reject') await payments.reject(id);
-      toast(`Payment ${action}d successfully`);
+      if (isMounted.current) {
+        toast(`Payment ${action === 'approve' ? 'approved' : 'rejected'} successfully`);
+      }
       loadData();
     } catch (err) {
-      toast(err.message || `Failed to ${action} payment`, 'error');
+      if (isMounted.current) {
+        toast(err.message || `Failed to ${action} payment`, 'error');
+      }
     }
   };
 
@@ -53,7 +71,7 @@ export const Admin = ({ user }) => {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }} className="au1">
           {data.map(p => (
-            <div key={p.id} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 24, padding: "28px", display: "flex", alignItems: "center", gap: 28, transition: "all 0.3s ease" }} className="card-hover">
+            <div key={p.id} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 24, padding: "28px", display: "flex", alignItems: "center", gap: 28, transition: "all 0.3s ease" }} className="card-hover stack-mobile admin-payment-card">
               <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
                 <div 
                   onClick={() => setPreviewUrl(p.screenshot)}

@@ -31,7 +31,7 @@ async function request(method, path, body, isFormData = false) {
   }
 
   // Hard failure handling: Prevent protected API calls if token is missing
-  const isPublicPath = path.startsWith('/auth/login') || path.startsWith('/auth/register') || path.startsWith('/auth/forgot') || path.startsWith('/auth/reset');
+  const isPublicPath = path.startsWith('/auth/login') || path.startsWith('/auth/register') || path.startsWith('/auth/forgot') || path.startsWith('/auth/reset') || path.startsWith('/verify/');
   if (!token && !isPublicPath) {
     console.error('[API] Missing token for protected route! Forcing logout.');
     clearToken();

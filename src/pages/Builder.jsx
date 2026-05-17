@@ -287,7 +287,7 @@ export const Builder = ({ user }) => {
       </div>
 
       {/* RIGHT: Preview Pane — Sticky to follow user controls */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px", position: "sticky", top: "24px", alignSelf: "flex-start" }}>
+      <div className="sticky-pane" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px", position: "sticky", top: "24px", alignSelf: "flex-start" }}>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--surface)", padding: "16px 24px", borderRadius: "12px", border: "1px solid var(--border)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

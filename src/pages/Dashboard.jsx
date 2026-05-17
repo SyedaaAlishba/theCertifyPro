@@ -8,22 +8,42 @@ export const Dashboard = ({ user, setPage }) => {
   const [stats, setStats] = useState({ total: 0, thisMonth: 0, themesUsed: 0, uniqueRecipients: 0 });
   const [recent, setRecent] = useState([]);
   
+  const isMounted = React.useRef(true);
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const [s, c] = await Promise.all([
-          certificates.stats(),
-          certificates.list({ limit: 5 })
-        ]);
-
-        if (s) setStats(s);
-        if (c) setRecent(c.certificates || []);
-      } catch (e) {
-        console.error("Dashboard fetch error", e);
-      }
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
     };
-    fetchDashboard();
   }, []);
+
+  const fetchDashboard = React.useCallback(async () => {
+    try {
+      const [s, c] = await Promise.all([
+        certificates.stats(),
+        certificates.list({ limit: 5 })
+      ]);
+
+      if (isMounted.current) {
+        setStats(s || {
+          total: 0,
+          thisMonth: 0,
+          themesUsed: 0,
+          uniqueRecipients: 0,
+          verifications: 0
+        });
+        setRecent(c?.certificates || []);
+      }
+    } catch (e) {
+      console.error("Dashboard fetch error", e);
+      if (isMounted.current) {
+        toast("Failed to load dashboard data", "error");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
   return (
     <div style={{ padding: 40, maxWidth: 1200 }}>
       {user.plan === "free" && (
@@ -36,7 +56,7 @@ export const Dashboard = ({ user, setPage }) => {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 40 }} className="au1">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 40 }} className="au1 grid-tablet-2 grid-mobile-1">
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: 24, borderRadius: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(191,164,106,0.1)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}><I n="award" s={20}/></div>
@@ -58,7 +78,7 @@ export const Dashboard = ({ user, setPage }) => {
             <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(145,121,242,0.1)", color: "var(--purple)", display: "flex", alignItems: "center", justifyContent: "center" }}><I n="star" s={20}/></div>
           </div>
           <p style={{ color: "var(--sub)", fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Verifications</p>
-          <h2 style={{ fontSize: 32, fontWeight: 700, marginTop: 4 }}>{stats.verifications || 0}</h2>
+          <h2 style={{ fontSize: 32, fontWeight: 700, marginTop: 4 }}>{stats.verifications ?? 0}</h2>
         </div>
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: 24, borderRadius: 12, display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <button className="btn-gold" style={{ padding: 16 }} onClick={() => setPage("builder")}>+ Create New</button>
@@ -66,7 +86,7 @@ export const Dashboard = ({ user, setPage }) => {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 32 }} className="au2">
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 32 }} className="au2 grid-tablet-1 grid-mobile-1">
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: 24 }}>
           <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 24 }}>Recent Exports</h3>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>

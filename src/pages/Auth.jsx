@@ -14,6 +14,13 @@ export const Auth = ({ onAuthSuccess, setPage }) => {
 
   const isMounted = useRef(true);
 
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -113,7 +120,7 @@ export const Auth = ({ onAuthSuccess, setPage }) => {
         </div>
       </div>
 
-      <div style={{ width: 560, flex: "none", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", borderLeft: "1px solid var(--border)" }} className="p-mobile-20 stack-mobile">
+      <div style={{ width: 560, maxWidth: "100%", flex: "none", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", borderLeft: "1px solid var(--border)" }} className="p-mobile-20 stack-mobile auth-form-container">
         <div style={{ width: "100%", maxWidth: 380 }} className="au0">
           <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 12, letterSpacing: "-0.02em" }}>
             {isForgot ? "Reset password" : (isLogin ? "Welcome back" : "Create account")}

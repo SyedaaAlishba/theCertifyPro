@@ -15,7 +15,7 @@ export const Shell = ({ user, page, setPage, handleLogOut, children }) => {
         />
       )}
 
-      <div className={isSidebarOpen ? "show-mobile" : "hide-mobile"} style={{ zIndex: 100 }}>
+      <div className={isSidebarOpen ? "sidebar-wrapper show-mobile" : "sidebar-wrapper hide-mobile"} style={{ zIndex: 100 }}>
         <Sidebar user={user} page={page} setPage={(p) => { setPage(p); setIsSidebarOpen(false); }} handleLogOut={handleLogOut} />
       </div>
 

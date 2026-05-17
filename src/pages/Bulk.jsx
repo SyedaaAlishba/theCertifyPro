@@ -40,6 +40,13 @@ export const Bulk = ({ user, setPage }) => {
   const [dragOver, setDragOver] = useState(false);
   
   const fileInputRef = useRef(null);
+  const isMounted = useRef(true);
+  React.useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleDragOver = (e) => { e.preventDefault(); setDragOver(true); };
   const handleDragLeave = () => { setDragOver(false); };
@@ -167,7 +174,9 @@ export const Bulk = ({ user, setPage }) => {
       await certificates.bulk({ certificates: records });
     } catch (e) {
       console.error("Bulk sync error", e);
-      setGenerating(false);
+      if (isMounted.current) {
+        setGenerating(false);
+      }
       const msg = e.message || "Unknown sync error";
       return toast(`Backend sync failed: ${msg}. Bulk generation aborted.`, "error");
     }
@@ -184,45 +193,65 @@ export const Bulk = ({ user, setPage }) => {
       const w = theme.isPortrait ? 1020 : 1440;
       const h = theme.isPortrait ? 1440 : 1020;
       
-      await new Promise((res, rej) => {
-        const blob = new Blob([svgString], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
-          URL.revokeObjectURL(url);
-          canvas.toBlob((b) => {
-            zip.file(`${rec.recipientName.replace(/[^a-z0-9]/gi, '_')}.png`, b);
-            res();
-          }, "image/png");
-        };
-        img.onerror = rej;
-        img.src = url;
-      });
-      setProgress(i + 1);
+      try {
+        await new Promise((res, rej) => {
+          const blob = new Blob([svgString], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(url);
+            canvas.toBlob((b) => {
+              zip.file(`${rec.recipientName.replace(/[^a-z0-9]/gi, '_')}.png`, b);
+              res();
+            }, "image/png");
+          };
+          img.onerror = rej;
+          img.src = url;
+        });
+      } catch (err) {
+        console.error("Image loading error", err);
+      }
+
+      if (isMounted.current) {
+        setProgress(i + 1);
+      } else {
+        return; // Break generation loop if user navigated away
+      }
     }
 
     toast("Archiving and downloading ZIP...");
-    const content = await zip.generateAsync({ type: "blob" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(content);
-    a.download = `CertifyPro_Bulk_${fmtD(new Date())}.zip`;
-    a.click();
+    try {
+      const content = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(content);
+      a.download = `CertifyPro_Bulk_${fmtD(new Date())}.zip`;
+      a.click();
+    } catch (err) {
+      console.error("ZIP generation error", err);
+      toast("Error archiving ZIP.", "error");
+    }
 
-    setGenerating(false);
-    toast(`Successfully generated ${records.length} certificates!`);
-    
-    // Refresh history immediately
-    if (setPage) setTimeout(() => setPage("history"), 1500);
+    if (isMounted.current) {
+      setGenerating(false);
+      toast(`Successfully generated ${records.length} certificates!`);
+      
+      // Refresh history immediately
+      if (setPage) {
+        setTimeout(() => {
+          if (isMounted.current) setPage("history");
+        }, 1500);
+      }
+    }
   };
 
   return (
     <div style={{ padding: "40px 20px", maxWidth: 1100, margin: "0 auto" }}>
-      <div style={{ marginBottom: 40, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }} className="au0">
+      <div style={{ marginBottom: 40, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }} className="au0 stack-mobile">
         <div>
           <h1 style={{ fontSize: 36, fontWeight: 850, marginBottom: 8, letterSpacing: "-0.02em" }}>Bulk Generator</h1>
           <p style={{ color: "var(--sub)", fontSize: 16 }}>Process hundreds of certificates at once by uploading your data.</p>
@@ -235,7 +264,7 @@ export const Bulk = ({ user, setPage }) => {
       </div>
 
       {!file ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 32 }} className="au1">
+        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 32 }} className="au1 grid-mobile-1 grid-tablet-1">
           {/* Upload Area */}
           <div 
             onDragOver={handleDragOver}
@@ -311,7 +340,7 @@ export const Bulk = ({ user, setPage }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }} className="au1">
           
           {/* Configuration Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
             
             {/* Global Settings */}
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 28 }}>
@@ -476,7 +505,7 @@ export const Bulk = ({ user, setPage }) => {
           </div>
 
           {/* Sticky Execution Bar */}
-          <div style={{ position: "sticky", bottom: 24, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 32px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.5)", backdropFilter: "blur(20px)" }} className="glass">
+          <div style={{ position: "sticky", bottom: 24, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 32px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 24, boxShadow: "0 20px 50px rgba(0,0,0,0.5)", backdropFilter: "blur(20px)" }} className="glass stack-mobile">
             <div>
               {generating ? (
                 <div style={{ color: "var(--accent)", fontSize: 16, fontWeight: 700, display: "flex", alignItems: "center", gap: 12 }}>

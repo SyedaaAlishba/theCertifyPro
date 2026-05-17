@@ -485,9 +485,30 @@ a {
     margin: 0 auto;
     max-width: 800px;
   }
+
+  .grid-tablet-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .grid-tablet-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sticky-pane {
+    position: relative !important;
+    top: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .stack-tablet {
+    flex-direction: column !important;
+  }
 }
 
 @media (max-width: 768px) {
+  body {
+    overflow-x: hidden !important;
+  }
 
   /* Layout adjustments */
   .hide-mobile {
@@ -520,6 +541,36 @@ a {
   /* Paddings */
   .p-mobile-20 {
     padding: 20px !important;
+  }
+
+  .sidebar-wrapper {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 100;
+  }
+
+  .w-mobile-100 {
+    width: 100% !important;
+  }
+
+  .auth-form-container {
+    border-left: none !important;
+  }
+
+  .admin-payment-card {
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 16px !important;
+  }
+
+  .admin-payment-card > div {
+    width: 100% !important;
+  }
+
+  .glass.stack-mobile {
+    gap: 16px !important;
   }
 }
 

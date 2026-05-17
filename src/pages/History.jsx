@@ -50,13 +50,13 @@ export const History = ({ user }) => {
   return (
     <div style={{ padding: "40px 20px", maxWidth: 1200, margin: "0 auto" }}>
       
-      <div style={{ marginBottom: 40, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }} className="au0">
+      <div style={{ marginBottom: 40, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }} className="au0 stack-mobile">
         <div>
           <h1 style={{ fontSize: 36, fontWeight: 850, marginBottom: 8, letterSpacing: "-0.02em" }}>Certificate History</h1>
           <p style={{ color: "var(--sub)", fontSize: 16 }}>Manage and track all certificates issued through your account.</p>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ position: "relative" }}>
+        <div style={{ display: "flex", gap: 12 }} className="w-mobile-100">
+          <div style={{ position: "relative" }} className="w-mobile-100">
           <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", color: "var(--muted)" }}>
             <I n="search" s={16} />
           </span>
@@ -66,7 +66,7 @@ export const History = ({ user }) => {
             placeholder="Search recipients, courses..." 
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: 300, paddingRight: 44, fontSize: 14 }}
+            style={{ width: 300, maxWidth: "100%", paddingRight: 44, fontSize: 14 }}
           />
         </div>
         </div>

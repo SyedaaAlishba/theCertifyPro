@@ -12,6 +12,14 @@ export const Payment = ({ user, setPage, planType }) => {
   const [paymentId, setPaymentId] = useState('');
   const [preview, setPreview] = useState(null);
 
+  const isMounted = React.useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!file) {
       setPreview(null);
@@ -23,10 +31,16 @@ export const Payment = ({ user, setPage, planType }) => {
   }, [file]);
 
   useEffect(() => {
-    payments.generateId().then(res => setPaymentId(res.paymentId)).catch(console.error);
+    payments.generateId()
+      .then(res => {
+        if (isMounted.current) {
+          setPaymentId(res?.paymentId || '');
+        }
+      })
+      .catch(console.error);
   }, []);
 
-  const isPkr = planType === 'pkr';
+  const isPkr = String(planType).toLowerCase() === 'pkr';
   const planName = isPkr ? 'Pro (PKR)' : 'Pro (International)';
   const amount = isPkr ? 'PKR 1399' : '$5';
 
@@ -67,12 +81,18 @@ export const Payment = ({ user, setPage, planType }) => {
         trxnId,
         note
       });
-      setSubmitted(true);
-      toast("Payment submitted successfully!");
+      if (isMounted.current) {
+        setSubmitted(true);
+        toast("Payment submitted successfully!");
+      }
     } catch (err) {
-      toast(err.message || "Failed to submit payment", "error");
+      if (isMounted.current) {
+        toast(err.message || "Failed to submit payment", "error");
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -161,7 +181,10 @@ export const Payment = ({ user, setPage, planType }) => {
                 <img src={preview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                 <button 
                   type="button"
-                  onClick={() => setFile(null)}
+                  onClick={() => {
+                    setFile(null);
+                    setPreview(null);
+                  }}
                   style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: 24, height: 24, color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
                   <I n="x" s={14} />
@@ -183,7 +206,7 @@ export const Payment = ({ user, setPage, planType }) => {
             />
           </div>
 
-          <button type="submit" className="btn-gold" style={{ width: "100%", padding: 16, marginTop: 8 }} disabled={loading}>
+          <button type="submit" className="btn-gold" style={{ width: "100%", padding: 16, marginTop: 8 }} disabled={loading || !paymentId}>
             {loading ? "Uploading & Submitting..." : "Submit Payment"}
           </button>
         </form>
